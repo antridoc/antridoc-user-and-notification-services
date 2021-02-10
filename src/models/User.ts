@@ -1,5 +1,5 @@
 import { Model, ObjectID, PreHook, Ref, Schema, Unique } from "@tsed/mongoose"
-import {CollectionOf, DateFormat, Default, Description, Enum, Example, Format, Groups, Ignore, MinLength, Optional, Required} from "@tsed/schema"
+import {AdditionalProperties, CollectionOf, DateFormat, Default, Description, Enum, Example, Format, Groups, Ignore, MinLength, Optional, Required} from "@tsed/schema"
 import { GenderEnum } from "../Enums/GenderEnum";
 import * as bcrypt from 'bcrypt'
 import { RolesEnum } from "../enums/RolesEnum";
@@ -18,10 +18,15 @@ export class Credentials {
   email: string;
 }
 
-export const hasingPassword = async (user: User, next: any) => {
+export const hasingCredentials = async (user: User, next: any) => {
   if(user.password) {
-    const salt = await bcrypt.genSalt(10)
-    user.password = bcrypt.hashSync(user.password, salt)
+    const saltPassword = await bcrypt.genSalt(10)
+    user.password = bcrypt.hashSync(user.password, saltPassword)
+  }
+
+  if (user.credentialsPin) {
+    const saltPin = await bcrypt.genSalt(10)
+    user.credentialsPin = bcrypt.hashSync(user.credentialsPin, saltPin)
   }
 }
 
@@ -30,10 +35,10 @@ export const hasingPassword = async (user: User, next: any) => {
     timestamps: true
   }
 })
-@PreHook('save', hasingPassword)
-@PreHook('updateOne', hasingPassword)
-@PreHook('update', hasingPassword)
-@PreHook('findOneAndUpdate', hasingPassword)
+@PreHook('save', hasingCredentials)
+@PreHook('updateOne', hasingCredentials)
+@PreHook('update', hasingCredentials)
+@PreHook('findOneAndUpdate', hasingCredentials)
 export class User extends Credentials {
 
   @Groups('!update', '!new')
@@ -44,8 +49,12 @@ export class User extends Credentials {
   @Groups('!update', '!new')
   isVerifiedEmail: boolean
 
+  @Ignore()
+  credentialsPin: string
+
   @Default(RolesEnum.DEFAULT)
   @Groups('!update', '!new')
+  @Ignore()
   role: string
 
   @Required()
@@ -71,6 +80,10 @@ export class User extends Credentials {
 
   verifyPassword(password: string) {
     return bcrypt.compareSync(password, this.password)
+  }
+
+  verifyCredentialsPin(pin: string) {
+    return bcrypt.compareSync(pin, this.credentialsPin)
   }
 }
 
