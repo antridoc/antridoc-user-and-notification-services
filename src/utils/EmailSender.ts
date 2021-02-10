@@ -58,10 +58,10 @@ export abstract class EmailSender {
         return await this.send()
     }
 
-    async resetPassword(to: IEmailData | string, aditionalLinks: string) {
+    async resetPassword(to: IEmailData | string, pin: string) {
         this.options.subject = 'Reset Password'
         this.options.to = to
-        this.options.aditionalLinks = aditionalLinks
+        this.options.pin = pin
         this.options.html = this.generateTemlate('resetPassword')
         return await this.send()
     }

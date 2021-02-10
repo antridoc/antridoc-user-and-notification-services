@@ -40,7 +40,8 @@
     "passport": "^0.4.1",
     "passport-http": "^0.3.0",
     "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "secure-pin": "^1.0.14"
   },
   "devDependencies": {
     "@tsed/cli-plugin-mongoose": "2.7.7",

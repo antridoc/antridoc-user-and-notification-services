@@ -11,12 +11,14 @@ import { PatientService } from "../services/PatientService";
 import { UserService } from "../services/UserService";
 import { EmailSender } from "../utils/emailSender";
 import { ResponsePayload } from "../utils/WrapperResponseFilter";
+import { CredentialsController } from "./auth/CredentialsController";
 import { ProfileController } from "./auth/ProfileController";
 
 @Controller({
     path: '/auth',
     children: [
         ProfileController,
+        CredentialsController,
     ]
 })
 @Name('Auth')

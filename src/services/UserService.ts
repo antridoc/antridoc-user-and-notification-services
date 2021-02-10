@@ -1,12 +1,11 @@
-import { Inject, Injectable, Service } from "@tsed/di"
+import { Inject, Service } from "@tsed/di"
 import { MongooseModel } from "@tsed/mongoose"
 import { User } from "../models/User"
 import * as jwt from "jsonwebtoken"
 import EnvConfig from "../config/EnvConfig"
 import { NotFound } from "@tsed/exceptions"
 import { ResponseMessageEnum } from "../enums/ResponseMessageEnum"
-import { Mongoose } from "mongoose"
-import { use } from "passport"
+import { generatePinSync } from 'secure-pin'
 
 @Service()
 export class UserService {
@@ -24,7 +23,8 @@ export class UserService {
     }
 
     async findByEmail(email: string): Promise<User> {
-        const user = await this.User.findOne({ email }) as User
+        const user = await this.User.findOne({ email })
+        if(!user) throw new NotFound(ResponseMessageEnum.AUTH_USER_NOT_FOUND)
         return user
     }
 
@@ -54,5 +54,14 @@ export class UserService {
         await user.save()
 
         return user
+    }
+
+    async getCredentialPin(user: User): Promise<string> {
+        const pin = generatePinSync(6)
+        const foundedUser = await this.User.findOne({email: user.email})
+        if (!foundedUser) throw new NotFound(ResponseMessageEnum.AUTH_USER_NOT_FOUND)
+        foundedUser.credentialsPin = pin
+        await foundedUser.save()
+        return pin
     }
 } 

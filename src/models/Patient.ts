@@ -26,21 +26,21 @@ export class PatientCreation {
     @Description('use date format: yyyy-mm-dd')
     dod: Date
 
-    @Required(true, null)
+    @Optional()
     @Example('O')
     blod_type: string
 
-    @Required(true, null)
+    @Optional()
     @Example('Jl. Kemerdekaan no. 40')
     address: string
 
-    @Required(true, null)
+    @Optional()
     identity_type: string
     
-    @Required(true, null)
+    @Optional()
     identity_number: string
 
-    @Required(true, null)
+    @Optional()
     identity_file: string
 }
 
