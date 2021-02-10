@@ -1,4 +1,4 @@
-import { BodyParams, Controller, Get, Inject, Post, Req, UseBefore } from "@tsed/common";
+import { BodyParams, Controller, Get, Inject, Post, QueryParams, Req, UseBefore } from "@tsed/common";
 import { deserialize } from "@tsed/json-mapper";
 import { Description, email, Name, Required, Security, Summary } from "@tsed/schema";
 import { LocalAuth } from "../decorators/LocalAuth";
@@ -17,9 +17,9 @@ export class PatientsController {
 
     @Get('/')
     async index(
-        @Req() req: Req
+        @Req() req: Req,
     ): Promise<ResponsePayload<Patient []>> {
-        const patients = await this.patientService.Patient.find({user: req.user }).exec()
+        const patients = await this.patientService.getByUser(req.user)
         const result = deserialize(patients, {type: Patient, groups: ['default']})
         return new ResponsePayload({data: result })
     }

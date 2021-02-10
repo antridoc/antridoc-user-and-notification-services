@@ -10,6 +10,11 @@ export class PatientService {
 
     $onInit() {}
 
+    async getByUser(user: any): Promise<Patient []> {
+        const patients = await this.Patient.find({user: user}).exec()
+        return patients
+    }
+
     async create(patient: any): Promise<Patient> {
         const newPatient = new this.Patient(patient)
         await newPatient.validate()
