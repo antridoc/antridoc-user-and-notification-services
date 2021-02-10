@@ -11,8 +11,14 @@ import { PatientService } from "../services/PatientService";
 import { UserService } from "../services/UserService";
 import { EmailSender } from "../utils/emailSender";
 import { ResponsePayload } from "../utils/WrapperResponseFilter";
+import { ProfileController } from "./auth/ProfileController";
 
-@Controller("/auth")
+@Controller({
+    path: '/auth',
+    children: [
+        ProfileController,
+    ]
+})
 @Name('Auth')
 export class AuthController {
 
@@ -84,26 +90,30 @@ export class AuthController {
         return new ResponsePayload({data: null})
     }
 
-    @Get("/profile")
-    @Summary('Get Profile')
-    @LocalAuth()
-    getUserProfile(
-        @Req() req: Req
-    ): ResponsePayload<Express.User> {
-        return new ResponsePayload({data: req.user})
-    }
+    // @Get("/profile")
+    // @Summary('Get Profile')
+    // @LocalAuth()
+    // getUserProfile(
+    //     @Req() req: Req
+    // ): ResponsePayload<Express.User> {
+    //     return new ResponsePayload({data: req.user})
+    // }
 
-    @Put("/profile")
-    @Summary('Update Profile')
-    @LocalAuth()
-    async updateUserProfile(
-        @Req() req: Req,
-        @Required() @BodyParams() @Groups('update') payload: User, 
-        @Res() res: Res
-    ): Promise<ResponsePayload<User>> {
-        const updateUser = await this.userService.User.findOneAndUpdate({email: payload.email}, payload).exec()
-        if(!updateUser) throw new BadRequest('Something wrong when updating data!',null)
-        const foundedUser = await this.userService.findByEmail(payload.email)
-        return new ResponsePayload({data: foundedUser})
-    }
+    // @Put("/profile")
+    // @Summary('Update Profile')
+    // @LocalAuth()
+    // async updateUserProfile(
+    //     @Req() req: Req,
+    //     @Required() @BodyParams() @Groups('update') payload: User, 
+    //     @Res() res: Res
+    // ): Promise<ResponsePayload<User>> {
+    //     const updateUser = await this.userService.User.findOneAndUpdate({email: payload.email}, payload).exec()
+    //     if(!updateUser) throw new BadRequest('Something wrong when updating data!',null)
+    //     const foundedUser = await this.userService.findByEmail(payload.email)
+    //     return new ResponsePayload({data: foundedUser})
+    // }
+
+    // @Get("/forgot-password")
+    // @Summary('Request Forgot Password')
+    // forgotPassword
 }
