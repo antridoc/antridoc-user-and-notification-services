@@ -81,6 +81,10 @@ export class User extends Credentials {
   verifyPassword(password: string) {
     return bcrypt.compareSync(password, this.password)
   }
+
+  verifyCredentialsPin(pin: string) {
+    return bcrypt.compareSync(pin, this.credentialsPin)
+  }
 }
 
 export class AuthUser extends User {

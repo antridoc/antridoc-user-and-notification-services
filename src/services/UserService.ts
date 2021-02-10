@@ -3,9 +3,10 @@ import { MongooseModel } from "@tsed/mongoose"
 import { User } from "../models/User"
 import * as jwt from "jsonwebtoken"
 import EnvConfig from "../config/EnvConfig"
-import { NotFound } from "@tsed/exceptions"
+import { NotFound, Unauthorized } from "@tsed/exceptions"
 import { ResponseMessageEnum } from "../enums/ResponseMessageEnum"
 import { generatePinSync } from 'secure-pin'
+import { use } from "passport"
 
 @Service()
 export class UserService {
@@ -58,10 +59,23 @@ export class UserService {
 
     async getCredentialPin(user: User): Promise<string> {
         const pin = generatePinSync(6)
+
         const foundedUser = await this.User.findOne({email: user.email})
         if (!foundedUser) throw new NotFound(ResponseMessageEnum.AUTH_USER_NOT_FOUND)
+        
         foundedUser.credentialsPin = pin
         await foundedUser.save()
+        
         return pin
+    }
+
+    async resetPassword(email: string, new_password: string, pin: string): Promise<void> {
+        const user = await this.User.findOne({email})
+        if (!user) throw new NotFound(ResponseMessageEnum.AUTH_USER_NOT_FOUND)
+        
+        if (!user.verifyCredentialsPin(pin)) throw new Unauthorized(ResponseMessageEnum.AUTH_INVALID_PIN)
+
+        user.password = new_password
+        await user.save()
     }
 } 
