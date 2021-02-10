@@ -1,10 +1,10 @@
 import { BodyParams, Context, Controller, Get, HeaderParams, Inject, Injectable, Next, Post, Put, QueryParams, Req, Res } from "@tsed/common";
 import { BadRequest } from "@tsed/exceptions";
 import { Authenticate, Authorize } from "@tsed/passport";
-import { CustomKey, email, Example, Format, MinLength, Name, Required, Returns, Schema, Security, Summary } from "@tsed/schema";
+import { CustomKey, email, Example, Format, Groups, MinLength, Name, Required, Returns, Schema, Security, Summary } from "@tsed/schema";
 import EnvConfig from "../config/EnvConfig";
 import { LocalAuth } from "../decorators/LocalAuth";
-import { Credentials, IAuthUserPayload, User, UserCreation } from "../models/User";
+import { Credentials, IAuthUserPayload, User } from "../models/User";
 import { strategyOptions } from "../protocols/JwtProtocol";
 import { LocalProtocol } from "../protocols/LocalProtocol";
 import { PatientService } from "../services/PatientService";
@@ -40,7 +40,7 @@ export class AuthController {
     @Summary('Sign Up')
     async register(
         @Req() req: Req, 
-        @Required() @BodyParams() payload: UserCreation, 
+        @Required() @BodyParams() @Groups('new') payload: User, 
         @Res() res: Res
     ): Promise<ResponsePayload<IAuthUserPayload>> {
         const {email, full_name} = payload
@@ -98,7 +98,7 @@ export class AuthController {
     @LocalAuth()
     async updateUserProfile(
         @Req() req: Req,
-        @Required() @BodyParams() payload: User, 
+        @Required() @BodyParams() @Groups('update') payload: User, 
         @Res() res: Res
     ): Promise<ResponsePayload<User>> {
         const updateUser = await this.userService.User.findOneAndUpdate({email: payload.email}, payload).exec()
